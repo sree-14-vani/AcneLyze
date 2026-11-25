@@ -1,0 +1,27 @@
+# Python
+backend/.venv/
+backend/.venv-win/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+backend/.env
+backend/data/*.db-shm
+backend/data/*.db-wal
+
+# Model weights and downloaded face-detection/parsing weights (never commit)
+backend/models/*.pth
+backend/facexlib/weights/
+facexlib/weights/
+backend/gfpgan/weights/
+gfpgan/weights/
+
+# Node
+frontend/node_modules*/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/

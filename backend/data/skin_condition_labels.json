@@ -1,0 +1,782 @@
+{
+  "classes": [
+    {
+      "id": "acne_vulgaris",
+      "label": "Acne vulgaris",
+      "threshold": 0.45
+    },
+    {
+      "id": "eczema_dermatitis",
+      "label": "Eczema / dermatitis",
+      "threshold": 0.5
+    }
+  ],
+  "activation": "softmax",
+  "input_size": 224,
+  "validation": {
+    "validation_dataset": "SCIN v1.0.0 verified dermatologist-labelled facial/head-neck subset plus DermaCon-IN v1.0.0 verified Disease_label facial subset",
+    "held_out_split": "Patient_key-disjoint stratified 15 percent test split using scin:case_id and dermacon:Subject_ID",
+    "accuracy": 0.6316,
+    "macro_f1": 0.6042,
+    "calibration_method": "Log-temperature scaling clamped to [0.5, 5.0] on validation logits with validation-only per-class threshold search",
+    "architecture": "efficientnet_b0",
+    "temperature": 0.9704,
+    "per_class_metrics": {
+      "acne_vulgaris": {
+        "precision": 0.6986,
+        "recall": 0.7183,
+        "f1": 0.7083,
+        "support": 71
+      },
+      "eczema_dermatitis": {
+        "precision": 0.5122,
+        "recall": 0.4884,
+        "f1": 0.5,
+        "support": 43
+      }
+    },
+    "confusion_matrix": [
+      [
+        51,
+        20
+      ],
+      [
+        22,
+        21
+      ]
+    ],
+    "class_order": [
+      "acne_vulgaris",
+      "eczema_dermatitis"
+    ],
+    "unsupported_requested_classes": {
+      "comedonal_acne": "No separate licensed dermatologist label is mapped to this class.",
+      "inflammatory_acne": "No separate licensed dermatologist label is mapped to this class.",
+      "rosacea": "Excluded from training because too few verified facial examples are available across SCIN and DermaCon-IN.",
+      "melasma": "DermaCon-IN has a verified Melasma label, but it is kept separate from PIH and has no exported backend class ID.",
+      "acne_scarring": "DermaCon-IN has Acne Scars, but scarring is not mapped to the acne_vulgaris condition class.",
+      "normal_skin": "Normal-quality images have no verified condition diagnosis label in either approved source.",
+      "hyperpigmentation": "Only 11 independent patients after face-crop validation."
+    },
+    "low_confidence_policy": {
+      "abstain_label": "uncertain_unable_to_classify",
+      "temperature_range": [
+        0.5,
+        5.0
+      ],
+      "threshold_source": "validation probabilities only",
+      "below_threshold_action": "abstain instead of forcing a condition"
+    },
+    "minimum_independent_patients_per_class": 20,
+    "dataset_split_summary": [
+      {
+        "split": "train",
+        "class_id": "acne_vulgaris",
+        "images": 9,
+        "unique_patients": 8,
+        "scin_patients": 1,
+        "dermacon_patients": 7
+      },
+      {
+        "split": "train",
+        "class_id": "eczema_dermatitis",
+        "images": 6,
+        "unique_patients": 6,
+        "scin_patients": 4,
+        "dermacon_patients": 2
+      },
+      {
+        "split": "validation",
+        "class_id": "acne_vulgaris",
+        "images": 2,
+        "unique_patients": 2,
+        "scin_patients": 0,
+        "dermacon_patients": 2
+      },
+      {
+        "split": "validation",
+        "class_id": "eczema_dermatitis",
+        "images": 1,
+        "unique_patients": 1,
+        "scin_patients": 0,
+        "dermacon_patients": 1
+      },
+      {
+        "split": "test",
+        "class_id": "acne_vulgaris",
+        "images": 71,
+        "unique_patients": 57,
+        "scin_patients": 7,
+        "dermacon_patients": 50
+      },
+      {
+        "split": "test",
+        "class_id": "eczema_dermatitis",
+        "images": 43,
+        "unique_patients": 39,
+        "scin_patients": 20,
+        "dermacon_patients": 19
+      }
+    ],
+    "class_counts_before_training": {
+      "acne_vulgaris": {
+        "images": 280,
+        "patients": 150
+      },
+      "eczema_dermatitis": {
+        "images": 186,
+        "patients": 151
+      },
+      "hyperpigmentation": {
+        "images": 43,
+        "patients": 27
+      }
+    },
+    "usable_face_crop_counts": {
+      "acne_vulgaris": {
+        "images": 82,
+        "patients": 67
+      },
+      "eczema_dermatitis": {
+        "images": 50,
+        "patients": 46
+      }
+    },
+    "source_label_counts": [
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Acne",
+        "class_id": "acne_vulgaris",
+        "images": 178
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Acne Conglobata",
+        "class_id": "acne_vulgaris",
+        "images": 76
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 4
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Atopic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 16
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 13
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Contact Dermatitis with secondary infection",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Disseminated Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Ear Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 2
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Infected Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Perioral dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Photodermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 42
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Phytophotodermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 12
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Post-Inflammatory hyperpigmentation",
+        "class_id": "hyperpigmentation",
+        "images": 40
+      },
+      {
+        "dataset": "DermaCon-IN",
+        "source_label": "Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 10
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne",
+        "class_id": "acne_vulgaris",
+        "images": 6
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Acne keloidalis;Folliculitis",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Acne;Acne",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Acne;Impetigo",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Acne;Seborrheic Dermatitis;Allergic Contact Dermatitis",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Acne;Skin and soft tissue atypical mycobacterial infection;Rosacea",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Bacterial pyoderma;Inflicted skin lesions",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Folliculitis",
+        "class_id": "acne_vulgaris",
+        "images": 5
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Insect Bite;Molluscum Contagiosum",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Irritant Contact Dermatitis",
+        "class_id": "acne_vulgaris",
+        "images": 2
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Perioral Dermatitis",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Perioral Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Rosacea",
+        "class_id": "acne_vulgaris",
+        "images": 3
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Rosacea;Comedone",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Rosacea;Hemangioma",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Rosacea;Perioral Dermatitis",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acne;Rosacea;Perioral Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acute dermatitis, NOS",
+        "class_id": "eczema_dermatitis",
+        "images": 2
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Acute dermatitis, NOS;Miliaria;Allergic Contact Dermatitis;Eczema;Hypersensitivity;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Allergic Contact Dermatitis;Irritant Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 6
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Cellulitis;Urticaria;Allergic Contact Dermatitis;Urticaria;Insect Bite;Allergic Contact Dermatitis;Acute dermatitis, NOS",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Drug Rash;Eczema;Inflicted skin lesions",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 10
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Allergic Contact Dermatitis;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Allergic Contact Dermatitis;Irritant Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Allergic Contact Dermatitis;Leukocytoclastic Vasculitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Allergic Contact Dermatitis;Perioral Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Allergic Contact Dermatitis;Viral Exanthem;Hypersensitivity;Allergic Contact Dermatitis;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Granuloma annulare",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Hypersensitivity",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Irritant Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 2
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Keratosis pilaris;Allergic Contact Dermatitis;Acne;Rosacea;Allergic Contact Dermatitis;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Remove from labeling tool;Allergic Contact Dermatitis;Tinea;Eczema;Allergic Contact Dermatitis;Acute dermatitis, NOS;Allergic Contact Dermatitis;Irritant Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Rosacea",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Eczema;Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Folliculitis;Hypersensitivity;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Folliculitis;Keratosis pilaris;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Herpes Zoster;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Herpes Zoster;Allergic Contact Dermatitis;Herpes Simplex",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Herpes Zoster;CD - Contact dermatitis;Herpes Zoster",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Hypersensitivity;Acne;Keratosis pilaris;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Hypersensitivity;Allergic Contact Dermatitis;Urticaria;Drug Rash;CD - Contact dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Impetigo;Inflicted skin lesions;Herpes Zoster;Lichen Simplex Chronicus;Impetigo;Acne;Acne",
+        "class_id": "acne_vulgaris",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Impetigo;Psoriasis;Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Insect Bite;Allergic Contact Dermatitis;Scabies;Acute dermatitis, NOS;Allergic Contact Dermatitis;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Insect Bite;Irritant Contact Dermatitis;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Intertrigo;Irritant Contact Dermatitis;Photodermatitis;Allergic Contact Dermatitis;Cellulitis;Intertrigo;Hypersensitivity",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Irritant Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Keratosis pilaris;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Lichen nitidus;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Lichen planus/lichenoid eruption;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Melasma;Post-Inflammatory hyperpigmentation;Drug induced abnormal pigmentation of skin",
+        "class_id": "hyperpigmentation",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Miliaria;Eczema;Photodermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "O/E - ecchymoses present;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Ochronosis;Post-Inflammatory hyperpigmentation",
+        "class_id": "hyperpigmentation",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Pemphigus;Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Perioral Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 3
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Photodermatitis;Acute dermatitis, NOS;Allergic Contact Dermatitis;Photodermatitis;Allergic Contact Dermatitis;Rosacea;Drug Rash;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Photodermatitis;Folliculitis;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Photodermatitis;Hypersensitivity",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Pityriasis rosea;Eczema;Syphilis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Post-Inflammatory hyperpigmentation;Scar Condition",
+        "class_id": "hyperpigmentation",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Psoriasis;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Psoriasis;Seborrheic Dermatitis;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Psoriasis;Seborrheic Dermatitis;Psoriasis;Eczema;Seborrheic Dermatitis;Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Rosacea;Allergic Contact Dermatitis;Irritant Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Seborrheic Dermatitis;Psoriasis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Skin cancer;Actinic Keratosis;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Allergic Contact Dermatitis;Irritant Contact Dermatitis;Photodermatitis;Eczema;Contact dermatitis, NOS;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 2
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Eczema;Porokeratosis;Tinea;Granuloma annulare;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Eczema;Psoriasiform dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Psoriasis;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Tinea;Psoriasis;Seborrheic Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Urticaria;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 2
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Urticaria;Eczema;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Urticaria;Insect Bite;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Urticaria;Irritant Contact Dermatitis;Allergic Contact Dermatitis",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      },
+      {
+        "dataset": "SCIN",
+        "source_label": "Viral Exanthem;Urticaria;Eczema",
+        "class_id": "eczema_dermatitis",
+        "images": 1
+      }
+    ],
+    "duplicate_policy": {
+      "duplicate_image_names_found": 0,
+      "duplicate_decoded_images_removed": 3,
+      "decode_failures": 0,
+      "images_without_detected_face": 365
+    },
+    "dermacon_label_policy": {
+      "allowed_labels": {
+        "acne_vulgaris": [
+          "Acne",
+          "Acne Conglobata"
+        ],
+        "eczema_dermatitis": [
+          "Allergic Contact Dermatitis",
+          "Atopic Dermatitis",
+          "Chronic eczema with secondary infection",
+          "Contact Dermatitis",
+          "Contact Dermatitis with secondary infection",
+          "Crusted eczematous dermatitis",
+          "Disseminated Eczema",
+          "Dry Discoid Eczema",
+          "Ear Eczema",
+          "Eczema",
+          "Infected Eczema",
+          "Perioral dermatitis",
+          "Photodermatitis",
+          "Phytophotodermatitis",
+          "Seborrheic Dermatitis"
+        ],
+        "hyperpigmentation": [
+          "Post-Inflammatory hyperpigmentation"
+        ]
+      },
+      "excluded_labels": {
+        "Rosacea": "Excluded from training because the verified facial subset has too few examples.",
+        "Melasma": "Kept separate from PIH; no backend melasma class is exported by this notebook.",
+        "Acne Scars": "Scarring is not the acne_vulgaris condition class.",
+        "Acne Keloidalis": "Not treated as interchangeable with acne_vulgaris.",
+        "Truncal Acne": "Trunk location is outside the facial classifier scope.",
+        "Hyperpigmentation disorder": "Not interchangeable with verified PIH.",
+        "Post-Inflammatory hypopigmentation": "Opposite pigment direction from PIH.",
+        "Lichen Planus pigmentosus": "Distinct diagnosis; not mapped to PIH."
+      },
+      "melasma_mapping": "None; verified Melasma rows are reported but never mapped to PIH or hyperpigmentation",
+      "verified_melasma_rows": 80
+    },
+    "patient_split_policy": {
+      "scin_key": "scin:case_id",
+      "dermacon_key": "dermacon:Subject_ID",
+      "raw_subject_id_overlap": 0,
+      "cross_dataset_identity_resolution": "Namespaced keys prevent accidental leakage; public IDs cannot prove cross-dataset subject identity."
+    }
+  }
+}

@@ -1,0 +1,44 @@
+# Verified on Python 3.12 / Apple M1 (CPU).
+# Install the GFPGAN family separately with --no-deps (see requirements-gfpgan.txt)
+# so pip does not replace opencv-python-headless with the GUI opencv-python package.
+#
+#   pip install -r requirements.txt
+#   pip install --no-deps -r requirements-gfpgan.txt
+
+# Web API
+fastapi==0.163.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.34
+pydantic==2.14.3
+httpx==0.28.1
+python-dotenv==1.2.4
+
+# Image and numerical stack
+pillow==13.0.0
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+PyYAML==6.0.3
+scipy==1.13.1
+scikit-image==0.24.0
+contourpy==1.2.1
+tifffile==2024.2.12
+
+# Official GFPGAN runtime support (the GFPGAN/BasicSR/facexlib wheels follow)
+torch==2.5.1
+torchvision==0.20.1
+lmdb==1.6.2
+addict==2.4.0
+future==1.0.0
+requests==2.32.3
+tb-nightly==2.21.0a20251023
+tqdm==4.67.1
+yapf==0.43.0
+filterpy==1.4.5
+numba==0.60.0
+llvmlite==0.43.0
+matplotlib==3.9.2
+
+# Acne detection and downloadable reports
+# Install with --no-deps alongside the GFPGAN wheels so opencv-python-headless is preserved.
+ultralytics==8.4.216
+reportlab==5.1.0

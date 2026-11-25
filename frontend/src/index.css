@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #1b2e4b;
+  background: #ffffff;
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: #1b2e4b;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Fraunces', Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+::selection {
+  background: #f8eee7;
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-white p-5 shadow-card sm:p-6;
+  }
+
+  .card-soft {
+    @apply rounded-card border border-line bg-powder/70 p-5 shadow-card sm:p-6;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/40;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-white hover:bg-[#12233B] active:scale-[0.99];
+  }
+
+  .btn-soft {
+    @apply btn border border-line bg-white text-ink hover:border-coral/40 hover:bg-powder/70;
+  }
+
+  .btn-ghost {
+    @apply btn text-muted hover:bg-powder/70 hover:text-ink;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/70 focus:border-sky focus:ring-2 focus:ring-powder;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[11px] font-semibold;
+  }
+
+  .section-title {
+    @apply font-display text-[26px] font-semibold text-ink sm:text-[32px];
+  }
+
+  .muted {
+    @apply text-sm leading-relaxed text-muted;
+  }
+
+  .grid-fade {
+    background-image: radial-gradient(circle at 12% 8%, rgba(243, 246, 249, 0.96), transparent 42%),
+      radial-gradient(circle at 90% 2%, rgba(248, 238, 231, 0.82), transparent 38%);
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cfd8e3;
+  border-radius: 999px;
+}
+
+@keyframes toast-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-slide-down {
+  animation: toast-slide-down 0.32s ease-out;
+}
