@@ -169,6 +169,13 @@ checkpoint, packages or face-detection weights are missing, `/api/enhance` retur
 - **Frontend:** build with `npm run build` and host `frontend/dist` on any static host. Set
   `VITE_API_URL` at build time, add the static origin to backend `CORS_ORIGINS`, and set
   `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` for real auth.
+- **Streamlit Community Cloud:** deploy this repository with `asgi_app.py` as the main file,
+  `master` as the branch, and Python 3.14. The root `requirements.txt` is the dependency file
+  Cloud installs. `asgi_app.py` is the ASGI wrapper: Streamlit serves `/` and mounts the existing
+  FastAPI application under `/api`, so `backend/app/main.py` is never executed as a Streamlit
+  script. The React frontend is unchanged; point its `VITE_API_URL` at
+  `https://<your-streamlit-app>.streamlit.app/api` when building for this deployment. Optional
+  GFPGAN/YOLO weights and AI keys remain environment-provided secrets and are never committed.
 
 ## API reference (abridged)
 

@@ -25,3 +25,4 @@ frontend/.env.*.local
 .DS_Store
 .vscode/
 .idea/
+.streamlit/secrets.toml
