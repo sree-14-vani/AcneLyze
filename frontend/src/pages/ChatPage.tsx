@@ -1,5 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
-import { MessageCircle, Mic, Send, Sparkles, Square, UserRound } from 'lucide-react';
+import { MessageCircle, Mic, Plus, Send, Sparkles, Square, Trash2, UserRound } from 'lucide-react';
 
 import { api, ApiError, errorMessage } from '../lib/api';
 import { useI18n } from '../lib/i18n';
@@ -39,6 +39,91 @@ type SubmitLike = { preventDefault: () => void };
 
 const SPEECH_LOCALES = { en: 'en-US', hi: 'hi-IN', kn: 'kn-IN', te: 'te-IN' } as const;
 const HISTORY_KEY = 'acneclear:chat-history';
+const CONVERSATIONS_KEY = 'acneclear:chat-conversations';
+const ACTIVE_KEY = 'acneclear:chat-active';
+const NEW_CHAT_TITLE = 'New Chat';
+
+interface ChatConversation {
+  id: string;
+  title: string;
+  messages: ChatTurn[];
+  updatedAt: number;
+}
+
+interface ChatState {
+  conversations: ChatConversation[];
+  activeId: string;
+}
+
+function createId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function parseTurns(raw: string | null): ChatTurn[] {
+  try {
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ChatTurn[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (item) =>
+          item &&
+          (item.role === 'user' || item.role === 'assistant') &&
+          typeof item.content === 'string' &&
+          item.content.trim(),
+      )
+      .slice(-24);
+  } catch {
+    return [];
+  }
+}
+
+function loadState(): ChatState {
+  try {
+    const raw = sessionStorage.getItem(CONVERSATIONS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ChatConversation[];
+      const conversations = (Array.isArray(parsed) ? parsed : [])
+        .filter((item) => item && typeof item.id === 'string')
+        .map((item) => ({
+          id: item.id,
+          title: typeof item.title === 'string' && item.title.trim() ? item.title : NEW_CHAT_TITLE,
+          messages: parseTurns(JSON.stringify(item.messages)),
+          updatedAt: Number(item.updatedAt) || Date.now(),
+        }));
+      if (conversations.length) {
+        const savedActive = sessionStorage.getItem(ACTIVE_KEY);
+        const activeId = conversations.some((item) => item.id === savedActive)
+          ? (savedActive as string)
+          : conversations[conversations.length - 1].id;
+        return { conversations, activeId };
+      }
+    }
+
+    const legacy = parseTurns(sessionStorage.getItem(HISTORY_KEY));
+    const conversation: ChatConversation = {
+      id: createId(),
+      title: legacy.find((item) => item.role === 'user')?.content.slice(0, 36) || NEW_CHAT_TITLE,
+      messages: legacy,
+      updatedAt: Date.now(),
+    };
+    sessionStorage.removeItem(HISTORY_KEY);
+    return { conversations: [conversation], activeId: conversation.id };
+  } catch {
+    const conversation: ChatConversation = {
+      id: createId(),
+      title: NEW_CHAT_TITLE,
+      messages: [],
+      updatedAt: Date.now(),
+    };
+    return { conversations: [conversation], activeId: conversation.id };
+  }
+}
+
+function titleFromMessage(text: string): string {
+  const clean = text.trim().replace(/\s+/g, ' ');
+  return clean.length > 36 ? `${clean.slice(0, 36)}…` : clean;
+}
 
 function isPermissionDenied(error: unknown): boolean {
   const name =
@@ -67,26 +152,6 @@ function latestDetection(): DetectionResult | null {
   }
 }
 
-function loadHistory(): ChatTurn[] {
-  try {
-    const raw = sessionStorage.getItem(HISTORY_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as ChatTurn[];
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(
-        (item) =>
-          item &&
-          (item.role === 'user' || item.role === 'assistant') &&
-          typeof item.content === 'string' &&
-          item.content.trim(),
-      )
-      .slice(-24);
-  } catch {
-    return [];
-  }
-}
-
 function chatErrorMessage(caught: unknown, t: (key: string) => string): string {
   if (!(caught instanceof ApiError)) return errorMessage(caught);
   if (caught.code === 'gemini_not_configured') return t('chatUnavailable');
@@ -111,7 +176,7 @@ function chatErrorMessage(caught: unknown, t: (key: string) => string): string {
 export default function ChatPage() {
   const { t, language } = useI18n();
   const { apiConfig, analyses, latestDiet, latestTips, preferences, profile, routine } = useApp();
-  const [messages, setMessages] = useState<ChatTurn[]>(loadHistory);
+  const [chatState, setChatState] = useState<ChatState>(loadState);
   const [input, setInput] = useState('');
   const [interimText, setInterimText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -138,6 +203,13 @@ export default function ChatPage() {
   const recognitionErrorRef = useRef(false);
   const permissionStreamRef = useRef<MediaStream | null>(null);
 
+  const activeConversation =
+    chatState.conversations.find((item) => item.id === chatState.activeId) ??
+    chatState.conversations[0];
+  const activeId = activeConversation?.id ?? '';
+  const messages = activeConversation?.messages ?? [];
+  const activeIdRef = useRef(activeId);
+
   const ready = apiConfig !== null;
   const geminiEnabled = apiConfig?.features.gemini_chat === true;
   const statusLabel = !apiConfig
@@ -147,18 +219,24 @@ export default function ChatPage() {
       : t('geminiOff');
   const statusTone = !apiConfig ? 'peach' : geminiEnabled ? 'green' : 'peach';
   const recognitionSupported = getSpeechRecognition() !== null;
+  const chatLocked = busy || listening || requestingMic || processingVoice;
+
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages, busy]);
+  }, [chatState, busy]);
 
   useEffect(() => {
     try {
-      sessionStorage.setItem(HISTORY_KEY, JSON.stringify(messages));
+      sessionStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(chatState.conversations));
+      sessionStorage.setItem(ACTIVE_KEY, chatState.activeId);
     } catch {
       void 0;
     }
-  }, [messages]);
+  }, [chatState]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -195,6 +273,62 @@ export default function ChatPage() {
   const releaseMic = () => {
     permissionStreamRef.current?.getTracks().forEach((track) => track.stop());
     permissionStreamRef.current = null;
+  };
+
+  const setActiveMessages = (next: ChatTurn[], id: string, title?: string) => {
+    setChatState((previous) => ({
+      ...previous,
+      conversations: previous.conversations.map((conversation) =>
+        conversation.id === id
+          ? {
+              ...conversation,
+              messages: next,
+              title: title ?? conversation.title,
+              updatedAt: Date.now(),
+            }
+          : conversation,
+      ),
+    }));
+  };
+
+  const resetDraftState = () => {
+    setInput('');
+    setInterimText('');
+    setError(null);
+    setFailedText(null);
+    setVoiceError(null);
+    setPermissionDenied(false);
+  };
+
+  const clearChat = () => {
+    if (chatLocked || busyRef.current || !messages.length) return;
+    if (!window.confirm(t('chatClearConfirm'))) return;
+    setActiveMessages([], activeId);
+    resetDraftState();
+  };
+
+  const newChat = () => {
+    if (chatLocked || busyRef.current) return;
+    const conversation: ChatConversation = {
+      id: createId(),
+      title: t('chatNewChat'),
+      messages: [],
+      updatedAt: Date.now(),
+    };
+    activeIdRef.current = conversation.id;
+    setChatState((previous) => ({
+      activeId: conversation.id,
+      conversations: [...previous.conversations, conversation],
+    }));
+    setUseContext(true);
+    resetDraftState();
+  };
+
+  const selectConversation = (id: string) => {
+    if (chatLocked || busyRef.current || id === activeId) return;
+    activeIdRef.current = id;
+    setChatState((previous) => ({ ...previous, activeId: id }));
+    resetDraftState();
   };
 
   const setVoiceMessage = (message: string | null, denied = false) => {
@@ -395,11 +529,12 @@ export default function ChatPage() {
     }
 
     busyRef.current = true;
+    const targetId = activeIdRef.current;
     const history = messages.slice(-23);
     const next: ChatTurn[] = options?.retry
       ? history
       : [...history, { role: 'user', content: text }];
-    setMessages(next);
+    setActiveMessages(next, targetId, options?.retry ? undefined : titleFromMessage(text));
     if (!options?.retry) {
       setInput('');
       setInterimText('');
@@ -438,7 +573,7 @@ export default function ChatPage() {
         throw new ApiError(t('chatInvalid'), 'gemini_invalid_response', 502);
       }
       const reply: ChatTurn = { role: 'assistant', content: response.reply };
-      setMessages([...next, reply].slice(-24));
+      setActiveMessages([...next, reply].slice(-24), targetId);
     } catch (caught) {
       if (!mountedRef.current) return;
       setError(chatErrorMessage(caught, t));
@@ -456,9 +591,31 @@ export default function ChatPage() {
         title={t('navChat')}
         subtitle={t('chatIntro')}
         action={
-          <Chip tone={statusTone}>
-            {statusLabel}
-          </Chip>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="soft"
+              className="px-3 py-1.5 text-xs"
+              onClick={newChat}
+              disabled={chatLocked}
+            >
+              <Plus size={14} />
+              {t('chatNewChat')}
+            </Button>
+            <Button
+              type="button"
+              variant="soft"
+              className="px-3 py-1.5 text-xs text-rose-600"
+              onClick={clearChat}
+              disabled={chatLocked || messages.length === 0}
+            >
+              <Trash2 size={14} />
+              {t('chatClearChat')}
+            </Button>
+            <Chip tone={statusTone}>
+              {statusLabel}
+            </Chip>
+          </div>
         }
       />
 
@@ -479,6 +636,7 @@ export default function ChatPage() {
                 <MessageCircle size={24} />
               </div>
               <p className="mt-4 font-display text-lg font-semibold text-ink">{t('chatIntro')}</p>
+              <p className="mt-2 text-xs leading-relaxed text-muted">{t('chatWelcome')}</p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {[
                   'Explain my skin analysis results in simple words.',
@@ -555,16 +713,34 @@ export default function ChatPage() {
             </div>
           )}
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-            <label className="flex items-center gap-2 text-[11px] text-muted">
-              <input
-                type="checkbox"
-                checked={useContext}
-                onChange={(event) => setUseContext(event.target.checked)}
-                className="accent-plum"
-              />
-              {t('chatContext')}
-              {analyses.length === 0 && ` — ${t('noData')}`}
-            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <label htmlFor="chat-conversation" className="sr-only">
+                {t('chatConversations')}
+              </label>
+              <select
+                id="chat-conversation"
+                value={activeId}
+                onChange={(event) => selectConversation(event.target.value)}
+                disabled={chatLocked}
+                className="field max-w-[190px] py-1.5 text-[11px]"
+              >
+                {chatState.conversations.map((conversation) => (
+                  <option key={conversation.id} value={conversation.id}>
+                    {conversation.title}
+                  </option>
+                ))}
+              </select>
+              <label className="flex items-center gap-2 text-[11px] text-muted">
+                <input
+                  type="checkbox"
+                  checked={useContext}
+                  onChange={(event) => setUseContext(event.target.checked)}
+                  className="accent-plum"
+                />
+                {t('chatContext')}
+                {analyses.length === 0 && ` — ${t('noData')}`}
+              </label>
+            </div>
             <span className="text-[10px] text-muted/70">
               {apiConfig
                 ? geminiEnabled
